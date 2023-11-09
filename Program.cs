@@ -1,11 +1,20 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 internal class Program
 {
     private static Character player;
+
     private static Items item1;
     private static Items item2;
-    private static List<int> equippedItems = new List<int>(); // 아이템 장착 정보를 유지하는 리스트
+    private static Items item3;
+    private static Items item4;
+    private static Items item5;
+    private static Items item6;
+
+    // 아이템 장착 정보 유지용 리스트
+    private static List<int> equippedItems = new List<int>();
+
+    Items[] items;
 
     static void Main(string[] args)
     {
@@ -15,12 +24,45 @@ internal class Program
 
     static void GameDataSetting()
     {
-        // 캐릭터 정보 세팅
-        player = new Character("루루", "원거리 딜러", 1, 47, 26, 595, 1500);
+        // 캐릭터 정보 세팅(이름, 직업, 레벨, 공격력, 방어력, 체력, 돈)
+        player = new Character("루루", "서포터", 1, 47, 26, 595, 1500);
 
-        // 아이템 정보 세팅
-        item1 = new Items("존야의 모래시계", "방어력", 45, "띵 - ");
-        item2 = new Items("구인수의 격노검", "공격력", 30, "AD룰루 필수템");
+        // 아이템 정보 세팅(배열 사용)
+        Items[] items = new Items[]
+        {
+        new Items("존야의 모래시계", "방어력", 45, "띵 - "),
+        new Items("구인수의 격노검", "공격력", 30, "AD룰루 필수템"),
+        new Items("몰락한 왕의 검", "공격력", 40, "체력 비례 데미지"),
+        new Items("강철심장", "체력", 800, "깡!"),
+        new Items("부서진 여왕의 왕관", "체력", 250, "챔피언 보호 효과"),
+        new Items("가고일 돌갑옷", "방어력", 60, "룰루로 이걸 왜 삼")
+        };
+
+        // switch문으로 배열을 변수에 할당
+        for (int i = 0; i < items.Length; i++)
+        {
+            switch (i)
+            {
+                case 0:
+                    item1 = items[i];
+                    break;
+                case 1:
+                    item2 = items[i];
+                    break;
+                case 2:
+                    item3 = items[i];
+                    break;
+                case 3:
+                    item4 = items[i];
+                    break;
+                case 4:
+                    item5 = items[i];
+                    break;
+                case 5:
+                    item6 = items[i];
+                    break;
+            }
+        }
     }
 
     static void DisplayGameIntro()
