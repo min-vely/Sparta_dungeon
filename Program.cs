@@ -9,16 +9,27 @@ internal class Program
     private static Items item2;
     private static Items item3;
     private static Items item4;
-    private static Items item5;
-    private static Items item6;
+
+    private static StoreItems storeItem1;
+    private static StoreItems storeItem2;
+    private static StoreItems storeItem3;
 
     // 아이템 장착 정보 유지용 리스트
     private static List<int> equippedItems = new List<int>();
+    // 상점용 아이템 리스트
+    private static List<int> boughtItems = new List<int>();
 
+
+    // 기본 보유 중인 아이템 배열
     static Items[] items;
+    // 상점용 아이템 배열
+    static StoreItems[] storeItems;
 
     static void Main(string[] args)
     {
+        //Console.BackgroundColor = ConsoleColor.White;
+        
+
         GameDataSetting();
         DisplayGameIntro();
     }
@@ -28,15 +39,13 @@ internal class Program
         // 캐릭터 정보 세팅(이름, 직업, 레벨, 공격력, 방어력, 체력, 돈)
         player = new Character("루루", "서포터", 1, 47, 26, 595, 1500);
 
-        // 아이템 정보 세팅(배열 사용)
+        // 기본 보유 중인 아이템 정보 세팅(배열 사용)
         items = new Items[]
         {
         new Items("존야의 모래시계", "방어력", 45, "띵 - "),
         new Items("구인수의 격노검", "공격력", 30, "AD룰루 필수템"),
         new Items("몰락한 왕의 검", "공격력", 40, "체력 비례 데미지"),
-        new Items("강철심장", "체력", 800, "깡!"),
-        new Items("부서진 여왕의 왕관", "체력", 250, "챔피언 보호 효과"),
-        new Items("가고일 돌갑옷", "방어력", 60, "룰루로 이걸 왜 삼")
+        new Items("부서진 여왕의 왕관", "체력", 250, "챔피언 보호 효과")
         };
 
         // switch문으로 배열을 변수에 할당
@@ -57,11 +66,29 @@ internal class Program
                 case 3:
                     item4 = items[i];
                     break;
-                case 4:
-                    item5 = items[i];
+            }
+        }
+
+        // 상점용 아이템 정보 세팅(배열 사용) 
+        storeItems = new StoreItems[]
+        {
+        new StoreItems("스태틱의 단검", "공격력", 50, "찌릿찌릿", 1500),
+        new StoreItems("강철심장", "체력", 800, "깡!", 1600),
+        new StoreItems("가고일 돌갑옷", "방어력", 60, "룰루로 이걸 왜 삼", 1600)
+        };
+
+        for (int i = 0; i < storeItems.Length; i++)
+        {
+            switch (i)
+            {
+                case 0:
+                    storeItem1 = storeItems[i];
                     break;
-                case 5:
-                    item6 = items[i];
+                case 1:
+                    storeItem2 = storeItems[i];
+                    break;
+                case 2:
+                    storeItem3 = storeItems[i];
                     break;
             }
         }
@@ -71,15 +98,25 @@ internal class Program
     {
         Console.Clear();
 
-        Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다.");
+        Console.ForegroundColor = ConsoleColor.DarkCyan;
+        Console.WriteLine("스파르타 마을에 오신 여러분 환영합니다. >ㅅ< ♡♡ °˚");
+        Console.ResetColor();
         Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        Console.WriteLine("보라색 맛 났어!");
+        Console.ResetColor();
+        Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine("1. 상태보기");
         Console.WriteLine("2. 인벤토리");
+        Console.WriteLine("3. 상점");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.ResetColor();
 
-        int input = CheckValidInput(1, 2);
+        int input = CheckValidInput(1, 3);
         switch (input)
         {
             case 1:
@@ -89,6 +126,9 @@ internal class Program
             case 2:
                 DisplayInventory();
                 break;
+            case 3:
+                StoreDisplay();
+                break;
         }
     }
 
@@ -96,7 +136,9 @@ internal class Program
     {
         Console.Clear();
 
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("상태보기");
+        Console.ResetColor();
         Console.WriteLine("캐릭터의 정보를 표시합니다.");
         Console.WriteLine();
         Console.WriteLine($"Lv.{player.Level}");
@@ -117,7 +159,7 @@ internal class Program
             int bonusDef = 0;
             int bonusHp = 0;
 
-            // 장착한 아이템 리스트에 1~6번이 들어가 있다면
+            // 장착한 아이템 리스트에 1~4번이 들어가 있다면
             foreach (int itemIndex in equippedItems)
             {
                 // 아이템 인덱스로 실제 아이템을 가져옴
@@ -178,7 +220,9 @@ internal class Program
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("원하시는 행동을 입력해주세요");
+        Console.ResetColor();
 
         int input = CheckValidInput(0, 0);
         switch (input)
@@ -196,10 +240,14 @@ internal class Program
 
         Console.Clear();
 
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("인벤토리");
+        Console.ResetColor();
         Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("[아이템 목록]");
+        Console.ResetColor();
 
         var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
 
@@ -214,7 +262,9 @@ internal class Program
         Console.WriteLine("1. 장착 관리");
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.ResetColor();
 
         int input = CheckValidInput(0, 1);
         switch (input)
@@ -233,10 +283,14 @@ internal class Program
     {
         Console.Clear();
 
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("인벤토리 - 장착 관리");
+        Console.ResetColor();
         Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("[아이템 목록]");
+        Console.ResetColor();
 
         var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
 
@@ -250,9 +304,13 @@ internal class Program
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.ResetColor();
 
-        int input = CheckValidInput(0, 6);
+        
+
+        int input = CheckValidInput(0, 4);
         // 사용자 입력값에서 1을 빼서 아이템의 인덱스로 변환
         int itemIndex = input - 1;
 
@@ -278,14 +336,6 @@ internal class Program
                 ItemEquipped(equippedItems, itemIndex);
                 EquipItems(equippedItems);
                 break;
-            case 5:
-                ItemEquipped(equippedItems, itemIndex);
-                EquipItems(equippedItems);
-                break;
-            case 6:
-                ItemEquipped(equippedItems, itemIndex);
-                EquipItems(equippedItems);
-                break;
         }
     }
 
@@ -298,6 +348,108 @@ internal class Program
         else
         {
             equippedItems.Add(itemNum);
+        }
+    }
+
+    static void StoreDisplay()
+    {
+        Console.Clear();
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("상점");
+        Console.ResetColor();
+        Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("[보유 골드]");
+        Console.ResetColor();
+        Console.WriteLine($"{player.Gold} G");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("[아이템 목록]");
+        Console.ResetColor();
+
+
+        var table = new ConsoleTable("아이템명", "효과", "아이템 설명", "가격");
+
+        for (int i = 0; i < storeItems.Length; i++)
+        {
+            table.AddRow($"- {storeItems[i].ItemName}", $"{storeItems[i].AbilityName} +{storeItems[i].AbilityValue}", $"{storeItems[i].ItemInfo}", $"{storeItems[i].Gold}");
+        }
+        table.Write();
+
+
+
+        Console.WriteLine();
+        Console.WriteLine("1. 아이템 구매");
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.ResetColor();
+
+        int input = CheckValidInput(0, 1);
+        switch (input)
+        {
+            case 0:
+                DisplayGameIntro();
+                break;
+            case 1:
+                Store(boughtItems);
+                break;
+
+        }
+    }
+
+    static void Store(List<int> boughtItems)
+    {
+        Console.Clear();
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("상점 - 아이템 구매");
+        Console.ResetColor();
+        Console.WriteLine("필요한 아이템을 얻을 수 있는 상점입니다.");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("[보유 골드]");
+        Console.ResetColor();
+        Console.WriteLine($"{player.Gold} G");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.WriteLine("[아이템 목록]");
+        Console.ResetColor();
+
+        var table = new ConsoleTable("아이템명", "효과", "아이템 설명", "가격");
+
+        for (int i = 0; i < storeItems.Length; i++)
+        {
+            table.AddRow($"- {i + 1} {storeItems[i].ItemName}", $"{storeItems[i].AbilityName} +{storeItems[i].AbilityValue}", $"{storeItems[i].ItemInfo}", $"{storeItems[i].Gold}");
+        }
+        table.Write();
+
+        Console.WriteLine();
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("원하시는 행동을 입력해주세요.");
+        Console.ResetColor();
+
+        int input = CheckValidInput(0, 3);
+        
+        switch (input)
+        {
+            case 0:
+                DisplayGameIntro();
+                break;
+            case 1:
+
+                break;
+            case 2:
+
+                break;
+            case 3:
+
+                break;
         }
     }
 
@@ -356,5 +508,23 @@ public class Items
         AbilityName = abilityname;
         AbilityValue = abilityvalue;
         ItemInfo = iteminfo;
+    }
+}
+
+public class StoreItems
+{
+    public string ItemName { get; }
+    public string AbilityName { get; }
+    public int AbilityValue { get; }
+    public string ItemInfo { get; }
+    public int Gold { get; }
+
+    public StoreItems(string itemname, string abilityname, int abilityvalue, string iteminfo, int gold)
+    {
+        ItemName = itemname;
+        AbilityName = abilityname;
+        AbilityValue = abilityvalue;
+        ItemInfo = iteminfo;
+        Gold = gold;
     }
 }
