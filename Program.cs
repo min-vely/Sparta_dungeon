@@ -103,9 +103,30 @@ internal class Program
         Console.ResetColor();
         Console.WriteLine("이곳에서 던전으로 들어가기 전 활동을 할 수 있습니다.");
         Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-        Console.WriteLine("보라색 맛 났어!");
+
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("|　　|　 | 　 |     |　   |　 |");
+        Console.WriteLine("|　　|　 | 　☆     |　   |　 |");
+        Console.WriteLine("|　　|　 * 　 　    *     |　 |");
+        Console.WriteLine("| 　★ 　　　 　 　   　 ★　 |");
+        Console.WriteLine("☆ 　　 　　　 　 　  　　   ☆");
         Console.ResetColor();
+        Console.WriteLine();
+
+
+        Console.WriteLine("┻┳ |");
+        Console.WriteLine("┳┻ |∧__∧");
+        Console.WriteLine("┻┳ |o _ o)");
+        Console.WriteLine("┳┻ |⊂ /");
+        Console.WriteLine("┻┳ | Ｊ");
+
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        Console.WriteLine("┏━━━━━━━━━━━━━━━━━━┓");
+        Console.WriteLine("┃  보라색 맛 났어!!┃");
+        Console.WriteLine("┗━━━━━━━━━━━━━━━━━━┛");
+        Console.ResetColor();
+
+
         Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine("1. 상태보기");
@@ -140,6 +161,32 @@ internal class Program
         Console.WriteLine("상태보기");
         Console.ResetColor();
         Console.WriteLine("캐릭터의 정보를 표시합니다.");
+        Console.WriteLine();
+
+        Console.WriteLine("");
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("     ###               ###    ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("     ###      ###  ##  ###      ###  ## ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("     ###      ###  ##  ###      ###  ## ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine("     ###      ###  ##  ###      ###  ## ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.DarkBlue;
+        Console.WriteLine("     ###      ###  ##  ###      ###  ## ");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        Console.WriteLine("     #######   #####   #######   #####  ");
+        Console.ResetColor();
+        Console.WriteLine();
+
+
+
+
         Console.WriteLine();
         Console.WriteLine($"Lv.{player.Level}");
         Console.WriteLine($"{player.Name} ( {player.Job} )");
@@ -465,8 +512,13 @@ internal class Program
                 if (ret >= min && ret <= max)
                     return ret;
             }
-
-            Console.WriteLine("잘못된 입력입니다.");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("     ＿人人人人人人人人人人人人人人人人人人人＿");
+            Console.WriteLine("     ＞잘못된 입력입니다. 다시 입력해 주세요.＜");
+            Console.WriteLine("     ￣^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y^Y￣");
+            Console.ResetColor();
+            Console.WriteLine();
         }
     }
 }
