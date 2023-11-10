@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using ConsoleTables;
 
 internal class Program
 {
@@ -200,10 +201,14 @@ internal class Program
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
 
+        var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
+
         for (int i = 0; i < items.Length; i++)
         {
-            Console.WriteLine($"- {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}      | {items[i].AbilityName} +{items[i].AbilityValue} | {items[i].ItemInfo}");
+            table.AddRow($"- {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
+            //Console.WriteLine($"- {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}      | {items[i].AbilityName} +{items[i].AbilityValue} | {items[i].ItemInfo}");
         }
+        table.Write();
 
         Console.WriteLine();
         Console.WriteLine("1. 장착 관리");
@@ -233,10 +238,14 @@ internal class Program
         Console.WriteLine();
         Console.WriteLine("[아이템 목록]");
 
+        var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
+
         for (int i = 0; i < items.Length; i++)
         {
-            Console.WriteLine($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}      | {items[i].AbilityName} +{items[i].AbilityValue} | {items[i].ItemInfo}");
+            table.AddRow($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
+            //Console.WriteLine($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}      | {items[i].AbilityName} +{items[i].AbilityValue} | {items[i].ItemInfo}");
         }
+        table.Write();
 
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
