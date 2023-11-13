@@ -19,7 +19,7 @@ internal class Program
     private static List<int> equippedItems = new List<int>();
     // 상점용 아이템 리스트
     private static List<int> boughtItems = new List<int>();
-    // 상점 아이템 구매 후 인벤토리 리스트
+    // 상점에서 구매한 아이템 리스트
     private static List<Items> inventory = new List<Items>();
 
 
@@ -302,7 +302,7 @@ internal class Program
         // 상점에서 구매한 아이템
         for (int i = 0; i < inventory.Count; i++)
         {
-            table.AddRow($"- {(equippedItems.Contains(i) ? "[E]" : "")}{inventory[i].ItemName}", $"{inventory[i].AbilityName} +{inventory[i].AbilityValue}", $"{inventory[i].ItemInfo}");
+            table.AddRow($"- {(equippedItems.Contains(i + items.Length) ? "[E]" : "")}{inventory[i].ItemName}", $"{inventory[i].AbilityName} +{inventory[i].AbilityValue}", $"{inventory[i].ItemInfo}");
         }
         table.Write();
 
@@ -356,7 +356,7 @@ internal class Program
         // 상점에서 구매한 아이템
         for (int i = 0; i < inventory.Count; i++)
         {
-            table.AddRow($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{inventory[i].ItemName}", $"{inventory[i].AbilityName} +{inventory[i].AbilityValue}", $"{inventory[i].ItemInfo}");
+            table.AddRow($"- {items.Length + i + 1} {(equippedItems.Contains(i + items.Length) ? "[E]" : "")}{inventory[i].ItemName}", $"{inventory[i].AbilityName} +{inventory[i].AbilityValue}", $"{inventory[i].ItemInfo}");
         }
         table.Write();
 
@@ -367,41 +367,19 @@ internal class Program
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.ResetColor();
 
-        int input = CheckValidInput(0, inventory.Count);
-        // 사용자 입력값에서 1을 빼서 아이템의 인덱스로 변환
-        int itemIndex = input - 1;
+        int input = CheckValidInput(0, (inventory.Count + items.Length));
 
         if (input == 0)
         {
-            DisplayInventory();
+            DisplayGameIntro();
             return;
         }
-
-        // 여긴 아이템 1 = 인덱스 1번!!!!!
-        switch (input)
-        {
-            case 0:
-                DisplayGameIntro();
-                break;
-            case 1:
-                ItemEquipped(equippedItems, itemIndex);
-                EquipItems();
-                break;
-                // 추가적인 아이템 핸들링 코드 추가
-                // case 2:
-                //     ItemEquipped(equippedItems, itemIndex);
-                //     EquipItems();
-                //     break;
-                // case 3:
-                //     ItemEquipped(equippedItems, itemIndex);
-                //     EquipItems();
-                //     break;
-                // case 4:
-                //     ItemEquipped(equippedItems, itemIndex);
-                //     EquipItems();
-                //     break;
-        }
+        // 사용자 입력값에서 1을 뺴서 아이템의 인덱스로 변환
+        int itemIndex = input - 1;
+        ItemEquipped(equippedItems, itemIndex);
+        EquipItems();
     }
+
 
 
     // 장착한 아이템 리스트에 추가/삭제
@@ -524,7 +502,7 @@ internal class Program
             Thread.Sleep(2000);
             Store(boughtItems);
         }
-        // 보유 골드가 아이템 가격보다 많다면
+        // 보유 골드가 아이템 가격보다 적다면
         else if (player.Gold < selectedItem.Gold)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -535,6 +513,7 @@ internal class Program
         }
         else
         {
+            Console.WriteLine("구매 완료! 2초 후 구매 창으로 돌아갑니다.");
             // 아이템 구매 시 골드 차감
             player.Gold -= selectedItem.Gold;
             boughtItems.Add(itemIndex);
@@ -542,7 +521,7 @@ internal class Program
             // 구매한 아이템을 인벤토리에 추가
             Items purchasedItem = new Items(selectedItem.ItemName, selectedItem.AbilityName, selectedItem.AbilityValue, selectedItem.ItemInfo);
             inventory.Add(purchasedItem);
-
+            Thread.Sleep(2000);
             Store(boughtItems);
         }
     }
