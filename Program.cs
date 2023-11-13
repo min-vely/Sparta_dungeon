@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Runtime.CompilerServices;
 using ConsoleTables;
 
@@ -18,6 +19,8 @@ internal class Program
     private static List<int> equippedItems = new List<int>();
     // 상점용 아이템 리스트
     private static List<int> boughtItems = new List<int>();
+    // 상점 아이템 구매 후 인벤토리 리스트
+    private static List<Items> inventory = new List<Items>();
 
 
     // 기본 보유 중인 아이템 배열
@@ -25,6 +28,7 @@ internal class Program
     // 상점용 아이템 배열
     static StoreItems[] storeItems;
 
+    // 캐릭터, 인벤토리 아이템, 상점 아이템 정보
     static void Main(string[] args)
     {
         //Console.BackgroundColor = ConsoleColor.White;
@@ -37,7 +41,7 @@ internal class Program
     static void GameDataSetting()
     {
         // 캐릭터 정보 세팅(이름, 직업, 레벨, 공격력, 방어력, 체력, 돈)
-        player = new Character("루루", "서포터", 1, 47, 26, 595, 1500);
+        player = new Character("루루", "서포터", 1, 47, 26, 595, 15000);
 
         // 기본 보유 중인 아이템 정보 세팅(배열 사용)
         items = new Items[]
@@ -94,6 +98,7 @@ internal class Program
         }
     }
 
+    // 콘솔 들어가면 메인으로 뜨는 화면
     static void DisplayGameIntro()
     {
         Console.Clear();
@@ -153,6 +158,7 @@ internal class Program
         }
     }
 
+    // 상태보기 화면
     static void DisplayMyInfo()
     {
         Console.Clear();
@@ -255,14 +261,6 @@ internal class Program
             }
         }
 
-
-
-
-        //// 총 능력치 출력
-        //int totalAtk = player.Atk + bonusAtk;
-        //int totalDef = player.Def + bonusDef;
-        //int totalHp = player.Hp + bonusHp;
-
         Console.WriteLine($"Gold : {player.Gold} G");
         Console.WriteLine();
         Console.WriteLine("0. 나가기");
@@ -280,11 +278,9 @@ internal class Program
         }
     }
 
-
+    // 인벤토리 화면
     static void DisplayInventory()
     {
-        //List<int> equippedItems = new List<int>();
-
         Console.Clear();
 
         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -298,10 +294,15 @@ internal class Program
 
         var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
 
+        // 기존 보유 아이템
         for (int i = 0; i < items.Length; i++)
         {
             table.AddRow($"- {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
-            //Console.WriteLine($"- {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}      | {items[i].AbilityName} +{items[i].AbilityValue} | {items[i].ItemInfo}");
+        }
+        // 상점에서 구매한 아이템
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            table.AddRow($"- {(equippedItems.Contains(i) ? "[E]" : "")}{inventory[i].ItemName}", $"{inventory[i].AbilityName} +{inventory[i].AbilityValue}", $"{inventory[i].ItemInfo}");
         }
         table.Write();
 
@@ -314,19 +315,25 @@ internal class Program
         Console.ResetColor();
 
         int input = CheckValidInput(0, 1);
-        switch (input)
-        {
-            case 0:
-                DisplayGameIntro();
-                break;
-            case 1:
-                EquipItems(equippedItems);
-                break;
 
+        if (input == 0)
+        {
+            DisplayGameIntro();
+            return;
         }
+        if (input == 1)
+        {
+            EquipItems();
+            return;
+        }
+
     }
 
-    static void EquipItems(List<int> equippedItems)
+
+
+
+    //장착 관리 화면
+    static void EquipItems()
     {
         Console.Clear();
 
@@ -341,10 +348,15 @@ internal class Program
 
         var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
 
+        // 기존 보유 아이템
         for (int i = 0; i < items.Length; i++)
         {
             table.AddRow($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
-            //Console.WriteLine($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{items[i].ItemName}      | {items[i].AbilityName} +{items[i].AbilityValue} | {items[i].ItemInfo}");
+        }
+        // 상점에서 구매한 아이템
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            table.AddRow($"- {i + 1} {(equippedItems.Contains(i) ? "[E]" : "")}{inventory[i].ItemName}", $"{inventory[i].AbilityName} +{inventory[i].AbilityValue}", $"{inventory[i].ItemInfo}");
         }
         table.Write();
 
@@ -355,11 +367,15 @@ internal class Program
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.ResetColor();
 
-        
-
-        int input = CheckValidInput(0, 4);
+        int input = CheckValidInput(0, inventory.Count);
         // 사용자 입력값에서 1을 빼서 아이템의 인덱스로 변환
         int itemIndex = input - 1;
+
+        if (input == 0)
+        {
+            DisplayInventory();
+            return;
+        }
 
         // 여긴 아이템 1 = 인덱스 1번!!!!!
         switch (input)
@@ -369,23 +385,26 @@ internal class Program
                 break;
             case 1:
                 ItemEquipped(equippedItems, itemIndex);
-                EquipItems(equippedItems);
+                EquipItems();
                 break;
-            case 2:
-                ItemEquipped(equippedItems, itemIndex);
-                EquipItems(equippedItems);
-                break;
-            case 3:
-                ItemEquipped(equippedItems, itemIndex);
-                EquipItems(equippedItems);
-                break;
-            case 4:
-                ItemEquipped(equippedItems, itemIndex);
-                EquipItems(equippedItems);
-                break;
+                // 추가적인 아이템 핸들링 코드 추가
+                // case 2:
+                //     ItemEquipped(equippedItems, itemIndex);
+                //     EquipItems();
+                //     break;
+                // case 3:
+                //     ItemEquipped(equippedItems, itemIndex);
+                //     EquipItems();
+                //     break;
+                // case 4:
+                //     ItemEquipped(equippedItems, itemIndex);
+                //     EquipItems();
+                //     break;
         }
     }
 
+
+    // 장착한 아이템 리스트에 추가/삭제
     static void ItemEquipped(List<int> equippedItems, int itemNum)
     {
         if (equippedItems.Contains(itemNum))
@@ -398,6 +417,8 @@ internal class Program
         }
     }
 
+    // 상점 화면
+    // 상점 화면
     static void StoreDisplay()
     {
         Console.Clear();
@@ -416,16 +437,15 @@ internal class Program
         Console.WriteLine("[아이템 목록]");
         Console.ResetColor();
 
-
         var table = new ConsoleTable("아이템명", "효과", "아이템 설명", "가격");
 
         for (int i = 0; i < storeItems.Length; i++)
         {
-            table.AddRow($"- {storeItems[i].ItemName}", $"{storeItems[i].AbilityName} +{storeItems[i].AbilityValue}", $"{storeItems[i].ItemInfo}", $"{storeItems[i].Gold}");
+            // 아이템 구매 여부 확인
+            string priceOrSoldOut = boughtItems.Contains(i) ? "구매완료" : $"{storeItems[i].Gold}";
+            table.AddRow($"- {storeItems[i].ItemName}", $"{storeItems[i].AbilityName} +{storeItems[i].AbilityValue}", $"{storeItems[i].ItemInfo}", priceOrSoldOut);
         }
         table.Write();
-
-
 
         Console.WriteLine();
         Console.WriteLine("1. 아이템 구매");
@@ -444,10 +464,11 @@ internal class Program
             case 1:
                 Store(boughtItems);
                 break;
-
         }
     }
 
+
+    // 상점의 아이템 구매 화면
     static void Store(List<int> boughtItems)
     {
         Console.Clear();
@@ -470,7 +491,9 @@ internal class Program
 
         for (int i = 0; i < storeItems.Length; i++)
         {
-            table.AddRow($"- {i + 1} {storeItems[i].ItemName}", $"{storeItems[i].AbilityName} +{storeItems[i].AbilityValue}", $"{storeItems[i].ItemInfo}", $"{storeItems[i].Gold}");
+            // 아이템 구매 여부 확인
+            string priceOrSoldOut = boughtItems.Contains(i) ? "구매완료" : $"{storeItems[i].Gold}";
+            table.AddRow($"- {i + 1} {storeItems[i].ItemName}", $"{storeItems[i].AbilityName} +{storeItems[i].AbilityValue}", $"{storeItems[i].ItemInfo}", priceOrSoldOut);
         }
         table.Write();
 
@@ -481,25 +504,50 @@ internal class Program
         Console.WriteLine("원하시는 행동을 입력해주세요.");
         Console.ResetColor();
 
-        int input = CheckValidInput(0, 3);
-        
-        switch (input)
+        int input = CheckValidInput(0, storeItems.Length);
+
+        if (input == 0)
         {
-            case 0:
-                DisplayGameIntro();
-                break;
-            case 1:
+            DisplayGameIntro();
+            return;
+        }
 
-                break;
-            case 2:
+        int itemIndex = input - 1;
+        StoreItems selectedItem = storeItems[itemIndex];
 
-                break;
-            case 3:
+        // 이미 구매한 아이템인지 확인
+        if (boughtItems.Contains(itemIndex))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("이미 구매한 아이템입니다. 2초 후 구매 창으로 돌아갑니다.");
+            Console.ResetColor();
+            Thread.Sleep(2000);
+            Store(boughtItems);
+        }
+        // 보유 골드가 아이템 가격보다 많다면
+        else if (player.Gold < selectedItem.Gold)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("보유 골드가 부족해요 ㅠㅅㅠ 2초 후 구매 창으로 돌아갑니다.");
+            Console.ResetColor();
+            Thread.Sleep(2000);
+            Store(boughtItems);
+        }
+        else
+        {
+            // 아이템 구매 시 골드 차감
+            player.Gold -= selectedItem.Gold;
+            boughtItems.Add(itemIndex);
 
-                break;
+            // 구매한 아이템을 인벤토리에 추가
+            Items purchasedItem = new Items(selectedItem.ItemName, selectedItem.AbilityName, selectedItem.AbilityValue, selectedItem.ItemInfo);
+            inventory.Add(purchasedItem);
+
+            Store(boughtItems);
         }
     }
 
+    // 사용자의 콘솔창 입력 시 예외처리
     static int CheckValidInput(int min, int max)
     {
         while (true)
@@ -532,7 +580,7 @@ public class Character
     public int Atk { get; }
     public int Def { get; }
     public int Hp { get; }
-    public int Gold { get; }
+    public int Gold { get; set; }
 
     public Character(string name, string job, int level, int atk, int def, int hp, int gold)
     {
