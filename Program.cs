@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using ConsoleTables;
+using static System.Net.Mime.MediaTypeNames;
 
 internal class Program
 {
@@ -142,13 +143,32 @@ internal class Program
         Console.ResetColor();
         Console.WriteLine();
 
-
-
-
         Console.WriteLine();
-        Console.WriteLine($"Lv.{player.Level}");
+        Console.WriteLine($"Lv. {player.Level}");
         Console.WriteLine($"{player.Name} ( {player.Job} )");
 
+        DisplayCharacterStatus();
+
+        Console.WriteLine($"Gold : {player.Gold} G");
+        Console.WriteLine();
+        Console.WriteLine("0. 나가기");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("원하시는 행동을 입력해주세요");
+        Console.ResetColor();
+
+        int input = CheckValidInput(0, 0);
+        switch (input)
+        {
+            case 0:
+                DisplayGameIntro();
+                break;
+        }
+    }
+
+    // 캐릭터 능력치를 표시하는 메소드
+    static void DisplayCharacterStatus()
+    {
         // 장착한 아이템이 하나도 없다면
         if (equippedItems.Count == 0)
         {
@@ -186,47 +206,39 @@ internal class Program
             }
 
             // 아이템으로 얻은 능력치가 0보다 큰 경우에만 표시
-            if (bonusAtk > 0)
-            {
-                Console.WriteLine($"공격력 : {player.Atk + bonusAtk} (+{bonusAtk})");
-            }
-            // 공격력 아이템을 장착하지 않았다면 기본 능력치 표시
-            else
-            {
-                Console.WriteLine($"공격력 : {player.Atk}");
-            }
-            if (bonusDef > 0)
-            {
-                Console.WriteLine($"방어력 : {player.Def + bonusDef} (+{bonusDef})");
-            }
-            else
-            {
-                Console.WriteLine($"방어력 : {player.Def}");
-            }
-            if (bonusHp > 0)
-            {
-                Console.WriteLine($"체력 : {player.Hp + bonusHp} (+{bonusHp})");
-            }
-            else
-            {
-                Console.WriteLine($"체력 : {player.Hp}");
-            }
+            DisplayBonusStat("공격력", bonusAtk);
+            DisplayBonusStat("방어력", bonusDef);
+            DisplayBonusStat("체력", bonusHp);
         }
+    }
 
-        Console.WriteLine($"Gold : {player.Gold} G");
-        Console.WriteLine();
-        Console.WriteLine("0. 나가기");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("원하시는 행동을 입력해주세요");
-        Console.ResetColor();
-
-        int input = CheckValidInput(0, 0);
-        switch (input)
+    // 아이템으로 얻은 능력치를 표시하는 메소드
+    static void DisplayBonusStat(string statName, int bonusValue)
+    {
+        // 아이템으로 얻은 능력치가 0보다 큰 경우에만 표시
+        if (bonusValue > 0)
         {
-            case 0:
-                DisplayGameIntro();
-                break;
+            Console.WriteLine($"{statName} : {GetPlayerStatValue(statName) + bonusValue} (+{bonusValue})");
+        }
+        else
+        {
+            Console.WriteLine($"{statName} : {GetPlayerStatValue(statName)}");
+        }
+    }
+
+    // 캐릭터의 특정 스탯 값을 가져오는 메소드
+    static int GetPlayerStatValue(string statName)
+    {
+        switch (statName)
+        {
+            case "공격력":
+                return player.Atk;
+            case "방어력":
+                return player.Def;
+            case "체력":
+                return player.Hp;
+            default:
+                return 0;
         }
     }
 
@@ -696,10 +708,21 @@ internal class Program
         Console.Clear();
 
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("던전입장");
+        Console.WriteLine("던전입장\n");
         Console.ResetColor();
-        Console.WriteLine("던전 클리어는 랜덤한 확률로 가능합니다.");
+
+        Console.WriteLine("                ┌─────────·········♡");
         Console.WriteLine();
+        Console.WriteLine(" ┌──── “ 도 전 하 시 겠 습 니 까 ? ¿ “ ");
+        Console.WriteLine(" │");
+        Console.WriteLine(" └─▶ 화 이 팅 。 ─────┐");
+        Console.WriteLine("                                           ♡");
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"현재 내 방어력 : {player.Def + CalculateBonusStat(equippedItems, "방어력")}");
+        Console.ResetColor();
+        Console.WriteLine();
+
         Console.WriteLine("1. 쉬운 던전     | 방어력 25 이상 권장");
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
@@ -723,7 +746,7 @@ internal class Program
     static void LoadDungeon()
     {
         Console.Clear();
-        Console.WriteLine(".　　 　 던\n");
+        Console.WriteLine(" 　　 　 던\n");
         Thread.Sleep(500);
         Console.WriteLine("　　　　 　 전\n");
         Thread.Sleep(500);
@@ -777,19 +800,23 @@ internal class Program
         Console.WriteLine("축하합니다!");
         Console.WriteLine("쉬운 던전을 클리어하였습니다 (/>ω<)/");
         Console.WriteLine();
-        
-        // 권장 방어력에 따른 체력 감소량 계산
-        int defGap = player.Def - 25;
-        int minusHp = random.Next(20 - defGap, 36 - defGap);
 
-        // 공격력에 따른 골드 획득량 계산
-        float atkRandomValue = random.Next(player.Atk, player.Atk * 2 + 1) / 100f;
+        // 권장 방어력(25)에 따른 체력 감소량 계산
+        int defGap = CalculateBonusStat(equippedItems, "방어력") - 25;
+        int minusHp = random.Next(100 - defGap, 200 - defGap);
+
+        // 아이템으로 얻은 능력치가 반영된 총 체력
+        int totalHp = CalculateBonusStat(equippedItems, "체력") + player.Hp;
+
+        // 아이템으로 얻은 공격력에 따른 골드 획득량 계산
+        int bonusAtk = CalculateBonusStat(equippedItems, "공격력");
+        float atkRandomValue = random.Next((player.Atk + bonusAtk), (player.Atk + bonusAtk * 2 + 1)) / 100f;
         int getGold = (int)(1000 + 1000 * atkRandomValue);
 
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("[탐험 결과]");
         Console.ResetColor();
-        Console.WriteLine($"체력 {player.Hp} -> {player.Hp - minusHp}");
+        Console.WriteLine($"체력 {totalHp} -> {totalHp - minusHp}");
         Console.WriteLine($"Gold {player.Gold} G -> {player.Gold + getGold} G");
         Console.WriteLine();
 
@@ -824,13 +851,16 @@ internal class Program
         Console.WriteLine();
 
         // 권장 방어력에 따른 체력 감소량 계산
-        int defGap = player.Def - 25;
-        int minusHp = random.Next(20 - defGap, 36 - defGap) / 2;
+        int defGap = CalculateBonusStat(equippedItems, "방어력") - 25;
+        int minusHp = random.Next(100 - defGap, 200 - defGap) / 2;
+
+        // 아이템으로 얻은 능력치가 반영된 총 체력
+        int totalHp = CalculateBonusStat(equippedItems, "체력") + player.Hp;
 
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("[탐험 결과]");
         Console.ResetColor();
-        Console.WriteLine($"체력 {player.Hp} -> {player.Hp - minusHp}");
+        Console.WriteLine($"체력 {totalHp} -> {totalHp - minusHp}");
         Console.WriteLine();
 
         player.Hp -= minusHp;
@@ -848,6 +878,24 @@ internal class Program
                 DisplayGameIntro();
                 break;
         }
+    }
+
+    // 아이템으로 얻은 능력치를 계산하는 메서드
+    static int CalculateBonusStat(List<int> equippedItems, string statName)
+    {
+        int bonusValue = 0;
+
+        foreach (int itemIndex in equippedItems)
+        {
+            Items equippedItem = items[itemIndex];
+
+            if (equippedItem.AbilityName == statName)
+            {
+                bonusValue += equippedItem.AbilityValue;
+            }
+        }
+
+        return bonusValue;
     }
 
     // 사용자의 콘솔창 입력 시 예외처리
