@@ -1,4 +1,4 @@
-﻿using ConsoleTables;
+using ConsoleTables;
 using System.Numerics;
 
 namespace ConsoleApp3
