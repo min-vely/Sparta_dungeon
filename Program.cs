@@ -7,6 +7,8 @@ using static System.Net.Mime.MediaTypeNames;
 internal class Program
 {
     public static Character player;
+    public static StoreManager storeManager;
+    public static InventoryManager inventoryManager;
 
     // 아이템 장착 정보 유지용 리스트
     public static List<int> equippedItems = new List<int>();
@@ -25,20 +27,20 @@ internal class Program
 
     static Random random = new Random();
 
-    public static StoreManager storeManager;
-
     // 캐릭터, 인벤토리 아이템, 상점 아이템 정보
     static void Main(string[] args)
     {
-        // 캐릭터 정보 세팅(이름, 직업, 레벨, 공격력, 방어력, 체력, 돈)
-        player = new Character("루루", "서포터", 1, 47, 26, 595, 15000);
         GameDataSetting();
         storeManager = new StoreManager(player);
+        inventoryManager = new InventoryManager();
         DisplayGameIntro();
     }
 
     static void GameDataSetting()
     {
+        // 캐릭터 정보 세팅(이름, 직업, 레벨, 공격력, 방어력, 체력, 돈)
+        player = new Character("루루", "서포터", 1, 47, 26, 595, 15000);
+
         // 여긴 아이템 1 = 인덱스 0번!!!!!
         // 기본 보유 중인 아이템 정보 세팅(배열 -> 리스트로 변경)
         items.Add(new Items("존야의 모래시계", "방어력", 45, "띵 - ", 1500));
@@ -104,7 +106,7 @@ internal class Program
                 DisplayMyInfo();
                 break;
             case 2:
-                DisplayInventory();
+                inventoryManager.DisplayInventory();
                 break;
             case 3:
                 storeManager.DisplayStore();
@@ -244,254 +246,6 @@ internal class Program
             default:
                 return 0;
         }
-    }
-
-    // 인벤토리 화면
-    static void DisplayInventory()
-    {
-        Console.Clear();
-
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("인벤토리");
-        Console.ResetColor();
-        Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("[아이템 목록]");
-        Console.ResetColor();
-
-        var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
-
-        // 모든 아이템 목록을 표시 (기존 보유 아이템과 상점에서 구매한 아이템)
-        for (int i = 0; i < items.Count; i++)
-        {
-            table.AddRow($"- {(items[i].IsEquipped ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
-        }
-        table.Write();
-
-        Console.WriteLine();
-        Console.WriteLine("1. 장착 관리");
-        Console.WriteLine("2. 아이템 정렬");
-        Console.WriteLine("0. 나가기");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("원하시는 행동을 입력해주세요.");
-        Console.ResetColor();
-
-        int input = CheckValidInput(0, 2);
-
-        if (input == 0)
-        {
-            DisplayGameIntro();
-            return;
-        }
-        if (input == 1)
-        {
-            EquipItems();
-            return;
-        }
-        if (input == 2)
-        {
-            OrderItems();
-            return;
-        }
-    }
-
-    //장착 관리 화면
-    static void EquipItems()
-    {
-        Console.Clear();
-
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("인벤토리 - 장착 관리");
-        Console.ResetColor();
-        Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("[아이템 목록]");
-        Console.ResetColor();
-
-        var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
-
-        // 기존 보유 아이템
-        for (int i = 0; i < items.Count; i++)
-        {
-            table.AddRow($"- {i + 1} {(items[i].IsEquipped ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
-        }
-        table.Write();
-
-        Console.WriteLine();
-        Console.WriteLine("0. 나가기");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("원하시는 행동을 입력해주세요.");
-        Console.ResetColor();
-
-        int input = CheckValidInput(0, items.Count);
-
-        if (input == 0)
-        {
-            DisplayGameIntro();
-            return;
-        }
-        // 사용자 입력값에서 1을 뺴서 아이템의 인덱스로 변환
-        int itemIndex = input - 1;
-        ItemEquipped(equippedItems, itemIndex, items[itemIndex]);
-        EquipItems();
-    }
-
-    // 장착한 아이템 리스트에 추가/삭제
-    static void ItemEquipped(List<int> equippedItems, int itemNum, Items item)
-    {
-        if (equippedItems.Contains(itemNum))
-        {
-            // 이미 해당 아이템이 장착되어 있는 경우, 아이템을 장착 해제
-            item.IsEquipped = false;
-            equippedItems.Remove(itemNum);
-        }
-        else
-        {
-            // 이미 같은 종류의 능력을 가진 아이템이 장착되어 있는지 확인
-            foreach (int equippedIndex in equippedItems)
-            {
-                Items equippedItem = items[equippedIndex];
-                if (equippedItem.AbilityName == item.AbilityName)
-                {
-                    // 이미 해당 종류의 능력을 가진 아이템이 장착되어 있으므로 장착 불가
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine("이미 같은 종류의 능력을 가진 아이템이 장착되어 있습니다. 2초 후 인벤토리 화면으로 돌아갑니다.");
-                    Console.ResetColor();
-                    Thread.Sleep(2000);
-                    DisplayInventory();
-                    return;
-                }
-            }
-            item.IsEquipped = true;
-            equippedItems.Add(itemNum);
-        }
-    }
-
-    static void OrderItems()
-    {
-        Console.Clear();
-
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("인벤토리 - 아이템 정렬");
-        Console.ResetColor();
-        Console.WriteLine("보유 중인 아이템을 관리할 수 있습니다.");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("[아이템 목록]");
-        Console.ResetColor();
-
-        var table = new ConsoleTable("아이템명", "효과", "아이템 설명");
-
-        // 모든 아이템 목록을 표시 (기존 보유 아이템과 상점에서 구매한 아이템)
-        for (int i = 0; i < items.Count; i++)
-        {
-            table.AddRow($"- {(items[i].IsEquipped ? "[E]" : "")}{items[i].ItemName}", $"{items[i].AbilityName} +{items[i].AbilityValue}", $"{items[i].ItemInfo}");
-        }
-        table.Write();
-
-        Console.WriteLine();
-        Console.WriteLine("1. 아이템명 가나다순");
-        Console.WriteLine("2. 장착순");
-        Console.WriteLine("3. 공격력");
-        Console.WriteLine("4. 방어력");
-        Console.WriteLine("5. 체력");
-        Console.WriteLine("0. 나가기");
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("원하시는 행동을 입력해주세요.");
-        Console.ResetColor();
-
-        int input = CheckValidInput(0, 5);
-
-        if (input == 0)
-        {
-            DisplayGameIntro();
-            return;
-        }
-        if (input == 1)
-        {
-            OrderItemsByName();
-            return;
-        }
-        if (input == 2)
-        {
-            OrderItemsByEquipped();
-            return;
-        }
-        if (input == 3)
-        {
-            OrderItemsByAbility("공격력");
-        }
-        if (input == 4)
-        {
-            OrderItemsByAbility("방어력");
-        }
-        if (input == 5)
-        {
-            OrderItemsByAbility("체력");
-        }
-    }
-
-    // 아이템 가나다순 정렬
-    static void OrderItemsByName()
-    {
-        items.Sort((item1, item2) => item1.ItemName.CompareTo(item2.ItemName));
-        DisplayInventory();
-    }
-
-    // 아이템 장착순 정렬
-    static void OrderItemsByEquipped()
-    {
-        items.Sort((item1, item2) =>
-        {
-            bool equipped1 = item1.IsEquipped;
-            bool equipped2 = item2.IsEquipped;
-
-            if (equipped1 && !equipped2)
-            {
-                return -1;
-            }
-            else if (!equipped1 && equipped2)
-            {
-                return 1;
-            }
-            else
-            {
-                return item1.ItemName.CompareTo(item2.ItemName);
-            }
-        });
-        DisplayInventory();
-    }
-
-    // 아이템 능력치순 정렬
-    static void OrderItemsByAbility(string statName)
-    {
-        items.Sort((item1, item2) =>
-        {
-            if (item1.AbilityName == statName && item2.AbilityName != statName)
-            {
-                return -1;
-            }
-            else if (item1.AbilityName != statName && item2.AbilityName == statName)
-            {
-                return 1;
-            }
-            else
-            {
-                // 내림차순 정렬
-                int result = item2.AbilityValue.CompareTo(item1.AbilityValue);
-                if (result == 0)
-                {
-                    return item1.ItemName.CompareTo(item2.ItemName);
-                }
-                return result;
-            }
-        });
-        DisplayInventory();
     }
 
 
