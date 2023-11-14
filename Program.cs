@@ -846,6 +846,13 @@ internal class Program
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("던전 클리어 실패");
         Console.ResetColor();
+        Console.WriteLine();
+        Console.WriteLine("■■■■    ■■     ■■■■   ■");
+        Console.WriteLine("■         ■  ■       ■      ■");
+        Console.WriteLine("■■■    ■■■■      ■      ■");
+        Console.WriteLine("■        ■    ■      ■      ■");
+        Console.WriteLine("■        ■    ■   ■■■■   ■■■■");
+        Console.WriteLine();
         Console.WriteLine("쉬운 던전 클리어에 실패하였습니다 (°□°)");
         Console.WriteLine("방어력을 좀 더 올려보세요.");
         Console.WriteLine();
@@ -966,20 +973,11 @@ public class Items
     }
 }
 
-public class StoreItems
+public class StoreItems : Items
 {
-    public string ItemName { get; }
-    public string AbilityName { get; }
-    public int AbilityValue { get; }
-    public string ItemInfo { get; }
-    public int Gold { get; }
-
-    public StoreItems(string itemname, string abilityname, int abilityvalue, string iteminfo, int gold)
+    public StoreItems(string itemName, string abilityName, int abilityValue, string itemInfo, int gold)
+        : base(itemName, abilityName, abilityValue, itemInfo, gold)
     {
-        ItemName = itemname;
-        AbilityName = abilityname;
-        AbilityValue = abilityvalue;
-        ItemInfo = iteminfo;
-        Gold = gold;
+        
     }
 }
