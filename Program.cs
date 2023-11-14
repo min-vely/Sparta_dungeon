@@ -722,8 +722,30 @@ internal class Program
     // 던전 진행 중 화면
     static void LoadDungeon()
     {
-        Console.WriteLine("로딩중  .   .   .");
-        Thread.Sleep(2000);
+        Console.Clear();
+        Console.WriteLine(".　　 　 던\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　 　 전\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　　  을\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　　 　 탐\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　　　　 험\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　 　　　 하\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　　　　 는\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　 　　중\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　　 。\n");
+        Thread.Sleep(500);
+        Console.WriteLine("　　　　　♡\n");
+        Thread.Sleep(500);
+        Console.WriteLine("(/●'o'●)/\n");
+        Thread.Sleep(1500);
+
         if (player.Def >= 25)
         {
             ClearDungeon();
@@ -749,21 +771,30 @@ internal class Program
         Console.Clear();
 
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("던전 클리어");
+        Console.WriteLine(" C┃ L┃ E┃ A┃ R┃");
+        Console.WriteLine(" ━┛ ━┛ ━┛ ━┛ ━┛\n");
         Console.ResetColor();
         Console.WriteLine("축하합니다!");
-        Console.WriteLine("쉬운 던전을 클리어 하였습니다 (/>ω<)/");
+        Console.WriteLine("쉬운 던전을 클리어하였습니다 (/>ω<)/");
         Console.WriteLine();
+        
+        // 권장 방어력에 따른 체력 감소량 계산
+        int defGap = player.Def - 25;
+        int minusHp = random.Next(20 - defGap, 36 - defGap);
+
+        // 공격력에 따른 골드 획득량 계산
+        float atkRandomValue = random.Next(player.Atk, player.Atk * 2 + 1) / 100f;
+        int getGold = (int)(1000 + 1000 * atkRandomValue);
 
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("[탐험 결과]");
         Console.ResetColor();
-        Console.WriteLine($"체력 {player.Hp} -> {player.Hp - 30}");
-        Console.WriteLine($"Gold {player.Gold} G -> {player.Gold + 1000} G");
+        Console.WriteLine($"체력 {player.Hp} -> {player.Hp - minusHp}");
+        Console.WriteLine($"Gold {player.Gold} G -> {player.Gold + getGold} G");
         Console.WriteLine();
 
-        player.Hp -= 30;
-        player.Gold += 1000;
+        player.Hp -= minusHp;
+        player.Gold += getGold;
 
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
@@ -792,13 +823,17 @@ internal class Program
         Console.WriteLine("방어력을 좀 더 올려보세요.");
         Console.WriteLine();
 
+        // 권장 방어력에 따른 체력 감소량 계산
+        int defGap = player.Def - 25;
+        int minusHp = random.Next(20 - defGap, 36 - defGap) / 2;
+
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("[탐험 결과]");
         Console.ResetColor();
-        Console.WriteLine($"체력 {player.Hp} -> {player.Hp - 15}");
+        Console.WriteLine($"체력 {player.Hp} -> {player.Hp - minusHp}");
         Console.WriteLine();
 
-        player.Hp -= 15;
+        player.Hp -= minusHp;
 
         Console.WriteLine("0. 나가기");
         Console.WriteLine();
