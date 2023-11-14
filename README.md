@@ -78,6 +78,14 @@
    2-1. 선택요구사항 9 : 쉬운 난이도의 던전 구현, 클리어 시 능력치에 따라 체력 손실 및 골드 획득 가능, 권장 방어력보다 낮다면 40% 확률로 클리어 실패
 
 
+3. 피드백 반영
+
+
+   3-1. StoreItems 클래스가 Items 클래스의 자식으로 상속받도록 함
+
+
+   3-2. Program.cs 파일의 메서드를 클래스와 파일로 분리(StoreManager.cs, InventoryManager.cs, DungeonManager.cs 파일로 분리함)
+
 
 
 
